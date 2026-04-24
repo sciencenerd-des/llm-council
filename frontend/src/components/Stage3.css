@@ -16,10 +16,202 @@
   font-family: monospace;
   margin-bottom: 12px;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vision-badge {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .final-text {
   color: #333;
   line-height: 1.7;
   font-size: 15px;
+}
+
+/* Chairman synthesis badge */
+.synthesis-badge {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  color: white;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.error-badge {
+  background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+  color: white;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* Chairman Dashboard Section */
+.chairman-dashboard {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 2px solid #c8e6c8;
+}
+
+.dashboard-title {
+  color: #2d8a2d;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+}
+
+.dashboard-images {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.chairman-plot {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
+}
+
+/* Code Toggle Section */
+.code-toggle-section {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px dashed #c8e6c8;
+}
+
+.code-toggle-button {
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #555;
+  transition: all 0.2s ease;
+}
+
+.code-toggle-button:hover {
+  background: #e8e8e8;
+  border-color: #ccc;
+}
+
+.chairman-code-block {
+  margin-top: 12px;
+}
+
+.chairman-code-block .code-block {
+  background: #1e1e1e;
+  color: #d4d4d4;
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* ============================================
+   Research Report Styles
+   ============================================ */
+
+.report-content {
+  color: #333;
+  line-height: 1.7;
+  font-size: 15px;
+}
+
+.report-content .markdown-content {
+  margin-bottom: 8px;
+}
+
+/* Inline visualization figure in report */
+.report-visualization {
+  margin: 24px 0;
+  padding: 0;
+  text-align: center;
+}
+
+.report-viz-image {
+  width: 100%;
+  max-width: 900px;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  border: 1px solid #e0e0e0;
+}
+
+.viz-caption {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #666;
+  font-style: italic;
+}
+
+/* ============================================
+   Visualizations Gallery at bottom
+   ============================================ */
+
+.visualizations-gallery {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 2px solid #c8e6c8;
+}
+
+.gallery-title {
+  color: #2d8a2d;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.gallery-item {
+  background: #fafafa;
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+  transition: box-shadow 0.2s ease;
+}
+
+.gallery-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.gallery-image {
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+.gallery-caption {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #555;
+  text-align: center;
+  font-weight: 500;
 }

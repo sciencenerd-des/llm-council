@@ -1,41 +1,77 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import Stage1 from './Stage1';
 import Stage2 from './Stage2';
 import Stage3 from './Stage3';
 import './ChatInterface.css';
 
-export default function ChatInterface({
+const ChatInterface = memo(function ChatInterface({
   conversation,
   onSendMessage,
   isLoading,
 }) {
   const [input, setInput] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
   const messagesEndRef = useRef(null);
+  const fileInputRef = useRef(null);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
-  }, [conversation]);
+  }, [conversation, scrollToBottom]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = useCallback((e) => {
     e.preventDefault();
-    if (input.trim() && !isLoading) {
-      onSendMessage(input);
+    if ((input.trim() || selectedFile) && !isLoading) {
+      onSendMessage(input, selectedFile);
       setInput('');
+      setSelectedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
-  };
+  }, [input, selectedFile, isLoading, onSendMessage]);
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = useCallback((e) => {
     // Submit on Enter (without Shift)
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSubmit(e);
     }
-  };
+  }, [handleSubmit]);
+
+  const handleFileChange = useCallback((e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (!file.name.toLowerCase().endsWith('.csv')) {
+        alert('Only CSV files are supported.');
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size exceeds 5MB limit.');
+        return;
+      }
+      setSelectedFile(file);
+    }
+  }, []);
+
+  const handleRemoveFile = useCallback(() => {
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  }, []);
+
+  const handleInputChange = useCallback((e) => {
+    setInput(e.target.value);
+  }, []);
+
+  const handleAttachClick = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
 
   if (!conversation) {
     return (
@@ -63,6 +99,9 @@ export default function ChatInterface({
                 <div className="user-message">
                   <div className="message-label">You</div>
                   <div className="message-content">
+                    {msg.file && (
+                      <div className="message-file-indicator">CSV: {msg.file.filename}</div>
+                    )}
                     <div className="markdown-content">
                       <ReactMarkdown>{msg.content}</ReactMarkdown>
                     </div>
@@ -73,26 +112,21 @@ export default function ChatInterface({
                   <div className="message-label">LLM Council</div>
 
                   {/* Stage 1 */}
-                  {msg.loading?.stage1 && (
-                    <div className="stage-loading">
-                      <div className="spinner"></div>
-                      <span>Running Stage 1: Collecting individual responses...</span>
-                    </div>
+                  {/* Stage1 handles its own loading state with progress indicator */}
+                  {(msg.loading?.stage1 || (msg.stage1 && msg.stage1.length > 0)) && (
+                    <Stage1
+                      responses={msg.stage1}
+                      pendingModels={msg.pendingModels || 0}
+                    />
                   )}
-                  {msg.stage1 && <Stage1 responses={msg.stage1} />}
 
-                  {/* Stage 2 */}
-                  {msg.loading?.stage2 && (
-                    <div className="stage-loading">
-                      <div className="spinner"></div>
-                      <span>Running Stage 2: Peer rankings...</span>
-                    </div>
-                  )}
-                  {msg.stage2 && (
+                  {/* Stage 2 - handles its own loading state with progress indicator */}
+                  {(msg.loading?.stage2 || (msg.stage2 && msg.stage2.length > 0)) && (
                     <Stage2
                       rankings={msg.stage2}
                       labelToModel={msg.metadata?.label_to_model}
                       aggregateRankings={msg.metadata?.aggregate_rankings}
+                      pendingModels={msg.pendingStage2Models || 0}
                     />
                   )}
 
@@ -120,26 +154,53 @@ export default function ChatInterface({
         <div ref={messagesEndRef} />
       </div>
 
-      {conversation.messages.length === 0 && (
-        <form className="input-form" onSubmit={handleSubmit}>
-          <textarea
-            className="message-input"
-            placeholder="Ask your question... (Shift+Enter for new line, Enter to send)"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            disabled={isLoading}
-            rows={3}
-          />
-          <button
-            type="submit"
-            className="send-button"
-            disabled={!input.trim() || isLoading}
-          >
-            Send
-          </button>
+      <form className="input-form" onSubmit={handleSubmit}>
+          {selectedFile && (
+            <div className="file-preview">
+              <span className="file-name">
+                CSV: {selectedFile.name}
+                <span className="file-info"> (full dataset will be analyzed via code execution)</span>
+              </span>
+              <button type="button" className="remove-file" onClick={handleRemoveFile}>x</button>
+            </div>
+          )}
+          <div className="input-row">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept=".csv"
+              style={{ display: 'none' }}
+            />
+            <button
+              type="button"
+              className="attach-button"
+              onClick={handleAttachClick}
+              title="Attach CSV"
+              disabled={isLoading}
+            >
+              +
+            </button>
+            <textarea
+              className="message-input"
+              placeholder="Ask your question... (Shift+Enter for new line, Enter to send)"
+              value={input}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              disabled={isLoading}
+              rows={3}
+            />
+            <button
+              type="submit"
+              className="send-button"
+              disabled={(!input.trim() && !selectedFile) || isLoading}
+            >
+              Send
+            </button>
+          </div>
         </form>
-      )}
     </div>
   );
-}
+});
+
+export default ChatInterface;

@@ -151,3 +151,146 @@
   color: #999;
   font-size: 12px;
 }
+
+/* Progressive loading styles */
+.stage2-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+  color: #666;
+}
+
+.stage2-loading .spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e0e0e0;
+  border-top-color: #f5a623;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 12px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.stage2-progress {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: #fff8e6;
+  border-radius: 8px;
+  border: 1px solid #ffe0a0;
+}
+
+.stage2-progress .progress-text {
+  font-size: 13px;
+  color: #b88a00;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.stage2-progress .progress-bar {
+  height: 6px;
+  background: #e0e0e0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.stage2-progress .progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #f5a623, #f7b84b);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* Verification code section */
+.verification-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed #e0e0e0;
+}
+
+.toggle-code-btn {
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #555;
+  transition: all 0.2s ease;
+}
+
+.toggle-code-btn:hover {
+  background: #e8e8e8;
+  border-color: #ccc;
+}
+
+.verification-code-block {
+  margin-top: 12px;
+  background: #fafafa;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+}
+
+.verification-code-block .code-header,
+.verification-code-block .output-header {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.verification-code-block .code-block {
+  background: #2d2d2d;
+  color: #f8f8f2;
+  padding: 12px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-family: 'Fira Code', monospace;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.verification-code-block .output-block {
+  background: #f0f0f0;
+  padding: 12px;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 13px;
+  white-space: pre-wrap;
+}
+
+.verification-code-block .output-block.error {
+  background: #fff0f0;
+  color: #c00;
+  border: 1px solid #ffcccc;
+}
+
+.verification-plot {
+  max-width: 100%;
+  margin-top: 12px;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+
+/* Tab indicator for verification code */
+.stage2 .tab.has-code {
+  border-bottom: 2px solid #f5a623;
+}
+
+.stage2 .tab .code-indicator {
+  font-size: 10px;
+  font-weight: normal;
+}
+
+.stage2 .tab .code-indicator.success {
+  color: #28a745;
+}
+
+.stage2 .tab .code-indicator.error {
+  color: #dc3545;
+}

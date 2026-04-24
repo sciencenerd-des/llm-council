@@ -91,22 +91,92 @@ export const api = {
 
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
+    let buffer = '';  // Buffer for incomplete SSE data
 
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
 
-      const chunk = decoder.decode(value);
-      const lines = chunk.split('\n');
+      // Append new chunk to buffer
+      buffer += decoder.decode(value, { stream: true });
 
-      for (const line of lines) {
-        if (line.startsWith('data: ')) {
-          const data = line.slice(6);
-          try {
-            const event = JSON.parse(data);
-            onEvent(event.type, event);
-          } catch (e) {
-            console.error('Failed to parse SSE event:', e);
+      // Process complete events (separated by double newline)
+      const events = buffer.split('\n\n');
+      // Keep the last potentially incomplete event in buffer
+      buffer = events.pop() || '';
+
+      for (const eventBlock of events) {
+        const lines = eventBlock.split('\n');
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            try {
+              const event = JSON.parse(data);
+              onEvent(event.type, event);
+            } catch (e) {
+              console.error('Failed to parse SSE event:', e);
+            }
+          }
+        }
+      }
+    }
+  },
+
+  /**
+   * Send a message with optional CSV file (streaming).
+   * @param {string} conversationId - The conversation ID
+   * @param {string} content - The message content
+   * @param {File|null} file - Optional CSV file
+   * @param {function} onEvent - Callback function for each event: (eventType, data) => void
+   * @returns {Promise<void>}
+   */
+  async sendMessageWithCSVStream(conversationId, content, file, onEvent) {
+    const formData = new FormData();
+    formData.append('content', content);
+    if (file) {
+      formData.append('file', file);
+    }
+
+    const response = await fetch(
+      `${API_BASE}/api/conversations/${conversationId}/message/with-csv/stream`,
+      {
+        method: 'POST',
+        body: formData,
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Unknown error' }));
+      throw new Error(error.detail || 'Failed to send message');
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';  // Buffer for incomplete SSE data
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      // Append new chunk to buffer
+      buffer += decoder.decode(value, { stream: true });
+
+      // Process complete events (separated by double newline)
+      const events = buffer.split('\n\n');
+      // Keep the last potentially incomplete event in buffer
+      buffer = events.pop() || '';
+
+      for (const eventBlock of events) {
+        const lines = eventBlock.split('\n');
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            try {
+              const event = JSON.parse(data);
+              onEvent(event.type, event);
+            } catch (e) {
+              console.warn('Failed to parse SSE event:', data);
+            }
           }
         }
       }
